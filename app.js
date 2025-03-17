@@ -5,14 +5,17 @@ import multer from "multer";
 import * as DataController from "./controllers/datas-controller.js";
 import * as UserController from "./controllers/user-controller.js";
 import checkAuth from "./utils/check-auth.js";
+import { startTimerUpdate } from "./services/timerService.js"; 
+
 
 mongoose
   .connect("mongodb+srv://oblivion:acdc2004@omex.iv9b8.mongodb.net/")
   .then(() => {
     console.log("db ok");
+    startTimerUpdate()
   })
   .catch((err) => console.log("db error", err));
-UserMod
+
 const app = express();
 app.use(express.json());
 app.use(cors());
