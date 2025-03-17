@@ -5,16 +5,19 @@ import multer from "multer";
 import * as DataController from "./controllers/datas-controller.js";
 import * as UserController from "./controllers/user-controller.js";
 import checkAuth from "./utils/check-auth.js";
-import { startTimerUpdate } from "./services/timerService.js"; 
-
+import { startTimerUpdate } from "./services/timerService.js";
+import dotenv from "dotenv";
+dotenv.config();
 
 mongoose
-  .connect("mongodb+srv://oblivion:acdc2004@omex.iv9b8.mongodb.net/")
+  .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("db ok");
-    startTimerUpdate()
+    startTimerUpdate();
   })
   .catch((err) => console.log("db error", err));
+
+const PORT = process.env.PORT || 3001;
 
 const app = express();
 app.use(express.json());
@@ -56,9 +59,9 @@ app.get("/debug/users", async (req, res) => {
   res.json(users);
 });
 
-app.listen(3001, (err) => {
+app.listen(PORT, (err) => {
   if (err) {
     return console.log(err);
   }
-  console.log("Server ok");
+  console.log(`Server running on port ${PORT}`);
 });
