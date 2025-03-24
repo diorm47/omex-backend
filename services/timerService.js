@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import DataModel from "../models/datas.js";
 
 const parseTimer = (timerStr) => {
@@ -15,18 +16,6 @@ const formatTimer = (seconds) => {
   ).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
 };
 
-// export const startTimerUpdate = () => {
-//   setInterval(async () => {
-//     const dataEntries = await DataModel.find();
-//     for (const entry of dataEntries) {
-//       const currentSeconds = parseTimer(entry.timer);
-//       if (currentSeconds > 0) {
-//         const newTimer = formatTimer(currentSeconds - 1);
-//         await DataModel.updateOne({ _id: entry._id }, { timer: newTimer });
-//       }
-//     }
-//   }, 1000); // уменьшаем каждую секунду
-// };
 export const startTimerUpdate = () => {
   console.log("🚀 startTimerUpdate запущен");
 
@@ -44,7 +33,11 @@ export const startTimerUpdate = () => {
           const newTimer = formatTimer(currentSeconds - 1);
           console.log(`🕒 Новый таймер: ${newTimer}`);
 
-          const updateResult = await DataModel.updateOne({ _id: entry._id }, { timer: newTimer });
+          const updateResult = await DataModel.updateOne(
+            { _id: new mongoose.Types.ObjectId(entry._id) }, // ✅ Приведение _id к ObjectId
+            { $set: { timer: newTimer } } // ✅ Используем $set для корректного обновления
+          );
+
           console.log(`✅ Обновлено: ${JSON.stringify(updateResult)}`);
         }
       }
