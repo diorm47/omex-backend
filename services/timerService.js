@@ -3,7 +3,7 @@ import DataModel from "../models/datas.js";
 
 const parseTimer = (timerStr) => {
   const [days, hours, minutes, seconds] = timerStr.split(":").map(Number);
-  return days * 86400 + hours * 3600 + minutes * 60 + seconds; // в секунды
+  return days * 86400 + hours * 3600 + minutes * 60 + seconds;
 };
 
 const formatTimer = (seconds) => {
@@ -33,9 +33,22 @@ export const startTimerUpdate = () => {
           const newTimer = formatTimer(currentSeconds - 1);
           console.log(`🕒 Новый таймер: ${newTimer}`);
 
+          // Преобразуем _id в ObjectId
+          const objectId = new mongoose.Types.ObjectId(entry._id);
+
+          // Проверяем, существует ли документ в БД
+          const existingEntry = await DataModel.findOne({ _id: objectId });
+          if (!existingEntry) {
+            console.log(
+              `❌ Ошибка: Документ с _id=${entry._id} не найден в БД`
+            );
+            continue;
+          }
+
+          // Обновляем таймер
           const updateResult = await DataModel.updateOne(
-            { _id: new mongoose.Types.ObjectId(entry._id) }, // ✅ Приведение _id к ObjectId
-            { $set: { timer: newTimer } } // ✅ Используем $set для корректного обновления
+            { _id: objectId },
+            { $set: { timer: newTimer } }
           );
 
           console.log(`✅ Обновлено: ${JSON.stringify(updateResult)}`);
